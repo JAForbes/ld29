@@ -212,12 +212,14 @@ Systems = {
 	},
 
 	Stop: function(){
-		E.Collided && _(E.Collided()).each(function(collided,entity){
+		E.Solid && E.Collided && _(E.Collided()).each(function(collided,entity){
 
 			var movement = E.Movement(entity);
 			var position = E.Position(entity);
 			
-			if(movement && position){
+			var bothSolid = E.Solid(entity) && E.Solid(collided.against);
+
+			if(movement && position && bothSolid){
 				
 				var box = [
 					_.create(E.Position(entity),E.Bounds(entity),E.Movement(entity)),
@@ -406,6 +408,8 @@ var player = E.create({
 	},
 	CameraFocused: {},
 	BoundsRenderable: {},
+	Solid: {}
+
 });
 
 var fish = E.create({
@@ -414,7 +418,7 @@ var fish = E.create({
 	CollisionSensitive: {},
 	Bounds: { width: 20, height: 20 },
 	Friction: { x: 0.1 },
-	BoundsRenderable: {}
+	BoundsRenderable: {},
 });
 
 var debug = E.create({
