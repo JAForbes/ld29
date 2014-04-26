@@ -375,6 +375,12 @@ Systems = {
 		});
 	},
 
+	ToggleSystems: function(entity,options){
+		var systems = options.systems;
+		var fn = _(use).intersection(systems).length > 0 && _.difference || _.union;
+		use = fn(use,systems);
+	},
+
 	CleanUp: function(){
 		delete E.components.Collided;
 		delete E.components.Launched;
@@ -403,12 +409,19 @@ var player = E.create({
 });
 
 var fish = E.create({
+	Frame: {scale: 2, playspeed: 1/20, frame: new Frame().reset(resource_jelly) },
 	Position: { x:0, y: 100-40 },
 	CollisionSensitive: {},
 	Bounds: { width: 20, height: 20 },
 	Friction: { x: 0.1 },
 	BoundsRenderable: {}
 });
+
+var debug = E.create({
+	KeyboardActivated: {
+		192: {system: 'ToggleSystems', options: {systems: ['BoundsRendering','WorldBoundsRendering']}, once: true},
+	},
+})
 
 var use = [
 	'CanvasSetup', 
