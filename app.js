@@ -1,3 +1,11 @@
+var currentThoughts = {
+	strategy : [
+		"Jellys avoid the Eels and you. You avoid the Eels.",
+		"Jellys only evade once.",
+		"To catch the jellys, attract the sharks, then run away?"
+	]
+}
+
 utils = (function(){
 
 	return {
@@ -70,6 +78,14 @@ _.mixin({
 		if(this.isNumber(num)){
 			return num > 0 && 1 || -1;
 		}
+	},
+
+	distance: function(p1,p2){
+		var x = p2.x - p1.x;
+		var y = p2.y - p1.y;
+		return Math.sqrt(
+			(x*x) + (y*y)
+		)
 	},
 
 });
@@ -313,8 +329,18 @@ Systems = {
 	},
 
 	Evade: function(){
-		E.Evade && _(E.Evade()).each(function(component,entity){
-
+		E.Evade && _(E.Evade()).each(function(evade,entity){
+			var position = E.Position(entity);
+			var movement = E.Movement(entity);
+			_(evade.these).each(function(other){
+				var movement2 = E.Movement(other);
+				var position2 = E.Position(other);
+				var distance = _(position).distance(position2);
+				if(distance < 50 ){
+					movement.vx = movement2.vx * 1.1;
+					movement.vy = movement2.vy* 1.1;
+				}
+			});
 		});
 	},
 
@@ -490,7 +516,7 @@ var player = E.create({
 
 });
 
-var fish = E.create({
+var jelly = E.create({
 	Frame: {scale: 2, playspeed: 1/20, frame: new Frame().reset(resource_jelly) },
 	Position: { x:0, y: 100-40 },
 	CollisionSensitive: {},
@@ -498,6 +524,8 @@ var fish = E.create({
 	Friction: { x: 0.1 },
 	BoundsRenderable: {},
 	Collectable: {},
+	Evade: { these: [player] },
+	Movement: {vx: 0, vy: 0},
 });
 
 var debug = E.create({
@@ -516,11 +544,11 @@ var use = [
 	'Collision',
 	'Collectable',
 	'Collected',
+	'Evade',
 	'Gravity', 
 	'Stop',
 	'WorldBounds',
 	'MaxSpeed',
-	//'Camera',
 	'BezierFollow',
 	'DrawFrames',
 	'Remove',
