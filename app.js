@@ -1,8 +1,12 @@
 var currentThoughts = {
-	strategy : [
-		"Jellys avoid the Eels and you. You avoid the Eels.",
-		"Jellys only evade once.",
-		"To catch the jellys, attract the sharks, then run away?"
+	strategy: [
+		"Throw the eels back to your boat",
+		"Don't get electrocuted",
+		"If it misses your boat it turns into two eels",
+		"Your has health and will break",
+
+		"Boat constantly moves - harder to aim consisently",
+		"Sun sets",
 	]
 }
 
@@ -337,12 +341,19 @@ Systems = {
 				var position2 = E.Position(other);
 				var distance = _(position).distance(position2);
 				if(distance < 50 ){
-					movement.vx = movement2.vx * 1.1;
-					movement.vy = movement2.vy* 1.1;
+					var next = _(position).clone();
+					next.x *= movement2.vx * Math.random();
+					next.y *= movement2.vy * 2;
+
+					if(_(next).distance(position2) > distance){
+						movement.vx = movement2.vx * Math.random();
+						movement.vy = movement2.vy * 2;
+					}
 				}
 			});
 		});
 	},
+
 
 	MaxSpeed: function(){
 		E.MaxSpeed && _(E.MaxSpeed()).each(function(maxSpeed,entity){
@@ -468,9 +479,14 @@ Systems = {
 			con.lineWidth = follow.lineWidth || 1;
 
 			// line color
-			con.strokeStyle = 'black';
+			con.strokeStyle = follow.strokeStyle || 'black';
 	  		con.stroke();
 		});
+	},
+
+	DrawSky: function(){
+		con.fillStyle = '#ABcdef'
+		con.fillRect(-can.width/2,-can.height/2,can.width,100);
 	},
 
 	CleanUp: function(){
@@ -481,7 +497,7 @@ Systems = {
 
 
 var boat = E.create({
-	Position : {x: 50, y: -160},
+	Position : {x: 50, y: -100},
 	Bounds: {width: 40, height: 20},
 	BoundsRenderable: {},
 });
@@ -492,9 +508,9 @@ var player = E.create({
 	Bounds: { width:20, height:30 },
 	Position: { x:0 , y:0 },
 	Movement: { vx: 0, vy: 0},
-	MaxSpeed: { vx: 2, vy: 2},
+	MaxSpeed: { vx: 1, vy: 1},
 	AirResistance: {},
-	WorldBounds: {top: -150, left: -150, right: 150, bottom: 150},
+	WorldBounds: {top: -150, left: -150, right: 150, bottom: 180},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
 	KeyboardActivated: {
@@ -506,9 +522,10 @@ var player = E.create({
 	BezierFollow: {
 		start: boat,
 		startOffset : {x: 0, y: 0},
-		first: {x: 50, y: -20},
-		second: {x: 0, y: 0},
-		endOffset: {x: 0, y: -(30/2) }
+		first: {x: 0, y: -200},
+		second: {x: 0, y: -120},
+		endOffset: {x: 0, y: -(30/2) },
+		strokeStyle: 'white'
 	},
 	CameraFocused: {},
 	BoundsRenderable: {},
@@ -528,11 +545,13 @@ var jelly = E.create({
 	Movement: {vx: 0, vy: 0},
 });
 
-var debug = E.create({
-	KeyboardActivated: {
-		192: {system: 'ToggleSystems', options: {systems: ['BoundsRendering','WorldBoundsRendering']}, once: true},
-	},
-})
+_(9).times(function(i){
+	E.create({
+		Frame: {scale: 3, playspeed: 1/10, frame: new Frame().reset(resource_waves) },
+		Position: {x: ((i-Math.floor(9/2))*16*3),y:E.Position(boat).y}
+	});
+});
+
 
 var use = [
 	'CanvasSetup', 
@@ -549,6 +568,7 @@ var use = [
 	'Stop',
 	'WorldBounds',
 	'MaxSpeed',
+	'DrawSky',
 	'BezierFollow',
 	'DrawFrames',
 	'Remove',
