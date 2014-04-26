@@ -312,6 +312,12 @@ Systems = {
 		}
 	},
 
+	Evade: function(){
+		E.Evade && _(E.Evade()).each(function(component,entity){
+
+		});
+	},
+
 	MaxSpeed: function(){
 		E.MaxSpeed && _(E.MaxSpeed()).each(function(maxSpeed,entity){
 			var movement = E.Movement(entity);
@@ -422,8 +428,9 @@ Systems = {
 			var position = E.Position(entity);
 			var bounds = E.Bounds(entity);
 
+			var start = E.Position(follow.start);
 			con.beginPath();
-			con.moveTo(follow.start.x,follow.start.y);
+			con.moveTo(start.x,start.y);
 			con.bezierCurveTo(
 				follow.first.x, 
 				follow.first.y, 
@@ -447,6 +454,13 @@ Systems = {
 }
 
 
+var boat = E.create({
+	Position : {x: 50, y: -160},
+	Bounds: {width: 40, height: 20},
+	BoundsRenderable: {},
+});
+
+
 var player = E.create({
 	Frame: {scale: 2, playspeed: 1/10, frame: new Frame().reset(resource_hook) },
 	Bounds: { width:20, height:30 },
@@ -464,7 +478,8 @@ var player = E.create({
 		40: {system: 'Launch', options: {vy: 0.4}, delay: 1},	
 	},
 	BezierFollow: {
-		start : {x: 0, y: -200},
+		start: boat,
+		startOffset : {x: 0, y: 0},
 		first: {x: 50, y: -20},
 		second: {x: 0, y: 0},
 		endOffset: {x: 0, y: -(30/2) }
