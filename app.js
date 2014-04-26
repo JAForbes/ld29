@@ -416,18 +416,28 @@ Systems = {
 		});
 	},
 
-	RenderBezier: function(){
-		var position = E.Position(1);
-		var bounds = E.Bounds(1);
+	BezierFollow: function(){
 
-		con.beginPath();
-		con.moveTo(0, -200);
-		con.bezierCurveTo(50, -20, 0, 0, position.x, position.y-bounds.height/2);
-		con.lineWidth = 1;
+		E.BezierFollow && _(E.BezierFollow()).each(function(follow,entity){
+			var position = E.Position(entity);
+			var bounds = E.Bounds(entity);
 
-		// line color
-		con.strokeStyle = 'black';
-  		con.stroke();
+			con.beginPath();
+			con.moveTo(follow.start.x,follow.start.y);
+			con.bezierCurveTo(
+				follow.first.x, 
+				follow.first.y, 
+				follow.second.x, 
+				follow.second.y, 
+				position.x + follow.endOffset.x, 
+				position.y + follow.endOffset.y
+			);
+			con.lineWidth = follow.lineWidth || 1;
+
+			// line color
+			con.strokeStyle = 'black';
+	  		con.stroke();
+		});
 	},
 
 	CleanUp: function(){
@@ -452,6 +462,12 @@ var player = E.create({
 		37: {system: 'Launch', options: {vx: -0.4}, delay: 1},
 		39: {system: 'Launch', options: {vx: 0.4}, delay: 1},
 		40: {system: 'Launch', options: {vy: 0.4}, delay: 1},	
+	},
+	BezierFollow: {
+		start : {x: 0, y: -200},
+		first: {x: 50, y: -20},
+		second: {x: 0, y: 0},
+		endOffset: {x: 0, y: -(30/2) }
 	},
 	CameraFocused: {},
 	BoundsRenderable: {},
@@ -490,7 +506,7 @@ var use = [
 	'WorldBounds',
 	'MaxSpeed',
 	//'Camera',
-	'RenderBezier',
+	'BezierFollow',
 	'DrawFrames',
 	'Remove',
 ];
