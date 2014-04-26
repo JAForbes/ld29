@@ -416,6 +416,20 @@ Systems = {
 		});
 	},
 
+	RenderBezier: function(){
+		var position = E.Position(1);
+		var bounds = E.Bounds(1);
+
+		con.beginPath();
+		con.moveTo(0, -200);
+		con.bezierCurveTo(50, -20, 0, 0, position.x, position.y-bounds.height/2);
+		con.lineWidth = 1;
+
+		// line color
+		con.strokeStyle = 'black';
+  		con.stroke();
+	},
+
 	CleanUp: function(){
 		delete E.components.Collided;
 		delete E.components.Launched;
@@ -476,7 +490,7 @@ var use = [
 	'WorldBounds',
 	'MaxSpeed',
 	//'Camera',
-	//'Background',
+	'RenderBezier',
 	'DrawFrames',
 	'Remove',
 ];
