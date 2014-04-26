@@ -126,6 +126,12 @@ E = (function(){
 					this.components[componentName][uid] = component
 				}
 			}
+		},
+
+		remove: function(uid){
+			_(this.components).each(function(componentHash,componentName){
+				delete componentHash[uid];
+			});
 		}
 	}
 })();
@@ -205,6 +211,7 @@ Systems = {
 				
 					if(collided){
 						E.add(e1, 'Collided', { against:e2 } );
+						E.add(e2, 'Collided', { against:e1 } );
 					}
 				}
 			});
@@ -383,6 +390,32 @@ Systems = {
 		use = fn(use,systems);
 	},
 
+	Collectable: function(){
+		var collected = [];
+		E.Collided && _(E.Collectable()).each(function(collectable, entity){
+			
+			var collided = E.Collided(entity);
+			if(collided){
+				E.add(entity,'Collected',{by: collided.against})
+				collected.push(entity)
+			}
+		});
+		E.components.Collectable = _(E.Collectable()).omit(collected);
+
+	},
+
+	Collected: function(){
+		E.Collected && _(E.Collected()).each(function(collected,entity){
+			E.add(entity,'Remove',{});
+		});
+	},
+
+	Remove: function(){
+		E.Remove && _(E.Remove()).each(function(remove,entity){
+			E.remove(entity);
+		});
+	},
+
 	CleanUp: function(){
 		delete E.components.Collided;
 		delete E.components.Launched;
@@ -419,6 +452,7 @@ var fish = E.create({
 	Bounds: { width: 20, height: 20 },
 	Friction: { x: 0.1 },
 	BoundsRenderable: {},
+	Collectable: {},
 });
 
 var debug = E.create({
@@ -435,7 +469,8 @@ var use = [
 	'Movement',  
 	'AirResistance',
 	'Collision',
-	'RemoveAirborne',
+	'Collectable',
+	'Collected',
 	'Gravity', 
 	'Stop',
 	'WorldBounds',
@@ -443,6 +478,7 @@ var use = [
 	//'Camera',
 	//'Background',
 	'DrawFrames',
+	'Remove',
 ];
 function loop(){
 	_(use).each(function(systemName){
