@@ -443,8 +443,6 @@ var use = [
 	//'Camera',
 	//'Background',
 	'DrawFrames',
-	'BoundsRendering',
-	'WorldBoundsRendering',
 ];
 function loop(){
 	_(use).each(function(systemName){
