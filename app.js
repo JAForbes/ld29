@@ -134,7 +134,6 @@ E = (function(){
 Systems = {
 
 	BoundsRendering: function(){
-		
 		E.Bounds && E.BoundsRenderable && _(E.BoundsRenderable()).each(function(component,entity){
 			var position = E.Position(entity);
 			var bounds = E.Bounds(entity);
@@ -144,6 +143,18 @@ Systems = {
 					con.rect(0,0,bounds.width,bounds.height);
 					con.stroke();
 				con.restore();
+			}
+		});
+	},
+
+	WorldBoundsRendering: function(){
+		E.WorldBounds && E.BoundsRenderable && _(E.BoundsRenderable()).each(function(component,entity){
+			var position = E.Position(entity);
+			var bounds = E.WorldBounds(entity);
+
+			if(position && bounds){
+				con.rect(bounds.left,bounds.top,bounds.right-bounds.left,bounds.bottom-bounds.top);
+				con.stroke();
 			}
 		});
 	},
@@ -306,15 +317,6 @@ Systems = {
 		});
 	},
 
-	/*Draw strips of color where the color is a function of y to help detect movement.  Like a test pattern*/
-	Background: function(){
-		E.CameraFocused && _(E.CameraFocused()).every(function(focus,entity){
-			var position = E.Position(entity);
-			con.fillRect(position.x,position.y,20,20);
-		});
-		
-	},
-
 	Camera: function(){
 		E.CameraFocused && _(E.CameraFocused()).each(function(focused,entity){
 			var pos = E.Position(entity);
@@ -356,8 +358,13 @@ Systems = {
 			var movement = E.Movement(entity);
 			var maxSpeed = E.MaxSpeed(entity);
 			
-			var outside = (position.y < world.top || position.y > world.bottom) ||
-			(position.x < world.left || position.x > world.right);
+			var future = {
+				x: position.x + movement.vx *2,
+				y: position.y + movement.vy *2,
+			}
+
+			var outside = (future.y < world.top || future.y > world.bottom) ||
+			(future.x < world.left || future.x > world.right);
 
 			if(outside){
 				position.x -= movement.vx;
@@ -382,7 +389,7 @@ var player = E.create({
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 2, vy: 2},
 	AirResistance: {},
-	WorldBounds: {top: -50, left: -50, right: 50, down: 50},
+	WorldBounds: {top: -150, left: -150, right: 150, bottom: 150},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
 	KeyboardActivated: {
@@ -395,19 +402,10 @@ var player = E.create({
 	BoundsRenderable: {},
 });
 
-var block = E.create({
-	
-	Position: { x:0, y: 100 },
-	CollisionSensitive: {},
-	Bounds: { width: 300, height: 1 },
-	Friction: { x: 0.8 },
-	BoundsRenderable: {}
-});
-
-var block = E.create({
+var fish = E.create({
 	Position: { x:0, y: 100-40 },
 	CollisionSensitive: {},
-	Bounds: { width: 40, height: 40 },
+	Bounds: { width: 20, height: 20 },
 	Friction: { x: 0.1 },
 	BoundsRenderable: {}
 });
@@ -425,10 +423,11 @@ var use = [
 	'Stop',
 	'WorldBounds',
 	'MaxSpeed',
-	'Camera',
+	//'Camera',
 	//'Background',
 	'DrawFrames',
 	'BoundsRendering',
+	'WorldBoundsRendering',
 ];
 function loop(){
 	_(use).each(function(systemName){
