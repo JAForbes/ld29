@@ -415,8 +415,10 @@ Systems = {
 				y: position.y + movement.vy *2,
 			}
 
-			var outside = (future.y < world.top || future.y > world.bottom) ||
-			(future.x < world.left || future.x > world.right);
+			var becauseY = (future.y < world.top || future.y > world.bottom);
+			var becauseX = (future.x < world.left || future.x > world.right);
+			var outside = becauseX || becauseY;
+			
 
 			if(outside){
 				position.x -= movement.vx;
@@ -523,7 +525,7 @@ var player = E.create({
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 1, vy: 1},
 	AirResistance: {},
-	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
+	WorldBounds: {top: -80, left: -150, right: 150, bottom: 50},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
 	KeyboardActivated: {
@@ -583,7 +585,7 @@ var jelly = E.create({
 	BoundsRenderable: {},
 	Collectable: {},
 	Evade: { these: [player] },
-	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
+	WorldBounds: {top: -50, left: -200, right: 200, bottom: 180},
 	Movement: {vx: Math.random(), vy: Math.random()},
 });
 
