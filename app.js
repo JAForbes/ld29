@@ -584,7 +584,7 @@ var jelly = E.create({
 	Collectable: {},
 	Evade: { these: [player] },
 	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
-	Movement: {vx: 0, vy: 0},
+	Movement: {vx: Math.random(), vy: Math.random()},
 });
 
 _(9).times(function(i){
