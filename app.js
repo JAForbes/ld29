@@ -489,10 +489,30 @@ Systems = {
 		con.fillRect(-can.width/2,-can.height/2,can.width,100);
 	},
 
+	Synchronize: function(){
+		E.Synchronize && _(E.Synchronize()).each(function(sync,entity){
+			_(sync.components).each(function(componentInfo){
+				var otherComponent = E[componentInfo.name](sync.entity);
+				var component = E[componentInfo.name](entity);
+				if(component && otherComponent){
+					_(componentInfo.attributes).each(function(attrName){
+						otherComponent[attrName] = component[attrName];
+						//apply filters if they exist
+						var filter = componentInfo.filters && componentInfo.filters[attrName];
+						if(filter){
+							otherComponent[attrName] = filter(otherComponent[attrName]);
+						}
+						
+					});
+				}
+			});
+		});
+	},
+
 	CleanUp: function(){
 		delete E.components.Collided;
 		delete E.components.Launched;
-	}
+	},
 }
 
 
@@ -502,22 +522,20 @@ var player = E.create({
 	Position: { x:0 , y:-50 },
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 1, vy: 1},
-	AirResistance: {},
+	AirResistance: {strength: 2},
 	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
 	KeyboardActivated: {
 		38: {system: 'Launch', options: {vy: -0.4}, delay: 1},
 		40: {system: 'Launch', options: {vy: 0.4}, delay: 1},	
-		192: {system: 'ToggleSystems', options: { systems: ['BoundsRendering','WorldBoundsRendering']}, once: 1},	
-
+		192: {system: 'ToggleSystems', options: { systems: ['BoundsRendering','WorldBoundsRendering']}, once: 1},
 	},
 	CameraFocused: {},
 	BoundsRenderable: {},
 	Solid: {}
 
 });	
-
 
 var boat = E.create({
 	Frame: {scale: 4, playspeed: 1/10, frame: new Frame().reset(resource_boat) },
@@ -542,6 +560,18 @@ var boat = E.create({
 		endOffset: {x: 1, y: 0 },
 		strokeStyle: 'rgba(255,255,255,0.8)'
 	},
+	Synchronize : {
+		entity: player,
+		components: [
+			{
+				name: 'Movement', attributes: ['vx'], filters: {
+					vx: function(val){
+						return val * -1;
+					} 
+				}
+			}
+		],
+	}
 });
 
 var jelly = E.create({
@@ -569,7 +599,8 @@ var use = [
 	'CleanUp',
 	'KeyboardTicker', 
 	'KeyboardActivation',
-	'Movement',  
+	'Movement',
+	'Synchronize',  
 	'AirResistance',
 	'Collision',
 	'Collectable',
