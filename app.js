@@ -500,6 +500,15 @@ var boat = E.create({
 	Position : {x: 50, y: -100},
 	Bounds: {width: 40, height: 20},
 	BoundsRenderable: {},
+	Movement: {vx: 0, vy: 0},
+	Solid: {},
+	CollisionSensitive: {},
+	KeyboardActivated: {
+		37: {system: 'Launch', options: {vx: -0.4}, delay: 1},
+		39: {system: 'Launch', options: {vx: 0.4}, delay: 1},
+	},
+	MaxSpeed: { vx: 1, vy: 1},
+	WorldBounds: {top: -150, left: -150, right: 150, bottom: 180},
 });
 
 
@@ -510,14 +519,14 @@ var player = E.create({
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 1, vy: 1},
 	AirResistance: {},
-	WorldBounds: {top: -150, left: -150, right: 150, bottom: 180},
+	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
 	KeyboardActivated: {
 		38: {system: 'Launch', options: {vy: -0.4}, delay: 1},
-		37: {system: 'Launch', options: {vx: -0.4}, delay: 1},
-		39: {system: 'Launch', options: {vx: 0.4}, delay: 1},
 		40: {system: 'Launch', options: {vy: 0.4}, delay: 1},	
+		192: {system: 'ToggleSystems', options: { systems: ['BoundsRendering','WorldBoundsRendering']}, once: 1},	
+
 	},
 	BezierFollow: {
 		start: boat,
