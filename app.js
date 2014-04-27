@@ -1,15 +1,3 @@
-var currentThoughts = {
-	strategy: [
-		"Throw the eels back to your boat",
-		"Don't get electrocuted",
-		"If it misses your boat it turns into two eels",
-		"Your has health and will break",
-
-		"Boat constantly moves - harder to aim consisently",
-		"Sun sets",
-	]
-}
-
 utils = (function(){
 
 	return {
@@ -41,6 +29,25 @@ utils = (function(){
 			)
 		},
 
+
+		//A more accurate version of the typeof operator
+		//[link](http://javascriptweblog.wordpress.com/2011/08/08/fixing-the-javascript-typeof-operator/)
+		toType: function(obj) {
+			return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+		},
+
+		deepClone: function(input,output){
+		    output = output || {};
+		    _(input).each(function(val,key){
+		      if(utils.toType(val) == 'object'){
+		        output[key] = this.deepClone(val,output[key]);
+		      } else {
+		        output[key] = val;
+		      }
+		    },this);
+		    return output;
+		},
+
 		unitVector: function(v){
 			var len_v = Math.sqrt(v.x*v.x + v.y*v.y);
 			return {
@@ -58,6 +65,14 @@ utils = (function(){
 			return {
 				x: ( dp / (b.x*b.x + b.y*b.y) ) * b.x,
 				y: ( dp / (b.x*b.x + b.y*b.y) ) * b.y
+			}
+		},
+
+		even: function(val){
+			if(Math.random() > 0.5){
+				return 1;
+			} else {
+				return -1;
 			}
 		}
 	}
@@ -511,6 +526,33 @@ Systems = {
 		});
 	},
 
+	QuickSave: function(){
+		window.backup = utils.deepClone(E.components);
+		return window.backup;
+	},
+
+	QuickLoad: function(saveGame){
+		saveGame = saveGame || window.backup;
+		E.components = utils.deepClone(saveGame);
+	},
+
+	WinCondition: function(){
+		E.WinCondition && _(E.WinCondition()).each(function(condition,entity){
+			if(condition.check()){
+				E.add(entity,'Winner',{});
+			}
+		});
+	},
+
+	Winner: function(){
+		E.Winner && E.Winner() && (message_win.className = '' );
+	},
+
+	Reset: function(){
+		Systems.QuickLoad();
+		message_win.className = 'hidden';
+	},
+
 	CleanUp: function(){
 		delete E.components.Collided;
 		delete E.components.Launched;
@@ -525,18 +567,23 @@ var player = E.create({
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 1, vy: 1},
 	AirResistance: {},
-	WorldBounds: {top: -80, left: -150, right: 150, bottom: 50},
+	WorldBounds: {top: -80, left: -150, right: 150, bottom: 100},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
 	KeyboardActivated: {
 		38: {system: 'Launch', options: {vy: -0.4}, delay: 1},
 		40: {system: 'Launch', options: {vy: 0.4}, delay: 1},	
 		192: {system: 'ToggleSystems', options: { systems: ['BoundsRendering','WorldBoundsRendering']}, once: 1},
+		82: {system: 'Reset', options: {}, once: 1},
 	},
 	CameraFocused: {},
 	BoundsRenderable: {},
-	Solid: {}
-
+	Solid: {},
+	WinCondition: {
+		check: function(){
+			return !!(E.Collected && E.Collected());
+		}
+	}
 });	
 
 var boat = E.create({
@@ -573,8 +620,17 @@ var boat = E.create({
 				}
 			}
 		],
-	}
+	},
 });
+
+
+// var mine = E.create({
+// 	Frame: {scale: 2.5, playspeed: 1/200, frame: new Frame().reset(resource_mine) },
+// 	Position: { x: -99, y: 0},
+// 	Movement: { vx: 1, vy: 0},
+// 	WorldBounds: {top : -50, left: -200, right: 200, bottom : 50},
+// 	Explosive: {}
+// });
 
 var jelly = E.create({
 	Frame: {scale: 2, playspeed: 1/20, frame: new Frame().reset(resource_jelly) },
@@ -597,6 +653,8 @@ _(9).times(function(i){
 });
 
 
+Systems.QuickSave();
+
 var use = [
 	'CanvasSetup', 
 	'CleanUp',
@@ -616,6 +674,8 @@ var use = [
 	'DrawSky',
 	'BezierFollow',
 	'DrawFrames',
+	'WinCondition',
+	'Winner',
 	'Remove',
 ];
 function loop(){
