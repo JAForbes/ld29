@@ -467,12 +467,12 @@ Systems = {
 
 			var start = E.Position(follow.start);
 			con.beginPath();
-			con.moveTo(start.x,start.y);
+			con.moveTo(start.x+follow.startOffset.x,start.y+follow.startOffset.y);
 			con.bezierCurveTo(
-				follow.first.x, 
-				follow.first.y, 
-				follow.second.x, 
-				follow.second.y, 
+				position.x + follow.firstOffset.x, 
+				position.y + follow.firstOffset.y, 
+				position.x + follow.secondOffset.x, 
+				position.y + follow.secondOffset.y, 
 				position.x + follow.endOffset.x, 
 				position.y + follow.endOffset.y
 			);
@@ -496,25 +496,6 @@ Systems = {
 }
 
 
-var boat = E.create({
-	Frame: {scale: 4, playspeed: 1/10, frame: new Frame().reset(resource_boat) },
-	Position : {x: 50, y: -120},
-	Bounds: {width: 40, height: 20},
-	BoundsRenderable: {},
-	Movement: {vx: 0, vy: 0},
-	Solid: {},
-	CollisionSensitive: {},
-	KeyboardActivated: {
-		37: {system: 'Launch', options: {vx: -0.4}, delay: 1},
-		39: {system: 'Launch', options: {vx: 0.4}, delay: 1},
-	},
-	MaxSpeed: { vx: 1, vy: 1},
-	WorldBounds: {top: -150, left: -150, right: 150, bottom: 180},
-	AirResistance: {},
-	
-});
-
-
 var player = E.create({
 	Frame: {scale: 2, playspeed: 1/10, frame: new Frame().reset(resource_hook) },
 	Bounds: { width:20, height:30 },
@@ -531,18 +512,36 @@ var player = E.create({
 		192: {system: 'ToggleSystems', options: { systems: ['BoundsRendering','WorldBoundsRendering']}, once: 1},	
 
 	},
-	BezierFollow: {
-		start: boat,
-		startOffset : {x: 0, y: 0},
-		first: {x: 0, y: -100},
-		second: {x: 0, y: -100},
-		endOffset: {x: 1, y: -(30/2) },
-		strokeStyle: 'rgba(255,255,255,0.8)'
-	},
 	CameraFocused: {},
 	BoundsRenderable: {},
 	Solid: {}
 
+});	
+
+
+var boat = E.create({
+	Frame: {scale: 4, playspeed: 1/10, frame: new Frame().reset(resource_boat) },
+	Position : {x: 50, y: -120},
+	Bounds: {width: 40, height: 20},
+	BoundsRenderable: {},
+	Movement: {vx: 0, vy: 0},
+	Solid: {},
+	CollisionSensitive: {},
+	KeyboardActivated: {
+		37: {system: 'Launch', options: {vx: -0.4}, delay: 1},
+		39: {system: 'Launch', options: {vx: 0.4}, delay: 1},
+	},
+	MaxSpeed: { vx: 1, vy: 1},
+	WorldBounds: {top: -150, left: -150, right: 150, bottom: 180},
+	AirResistance: {},
+	BezierFollow: {
+		start: player,
+		startOffset : {x: 0, y: -13.5},
+		firstOffset: {x: 0, y: -80},
+		secondOffset: {x: 0, y: 10},
+		endOffset: {x: 1, y: 0 },
+		strokeStyle: 'rgba(255,255,255,0.8)'
+	},
 });
 
 var jelly = E.create({
