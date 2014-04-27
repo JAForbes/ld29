@@ -38,9 +38,6 @@ function Frame(){
     this.repeat = true;
     this.con = document.getElementsByTagName('canvas')[0].getContext('2d');
     this._scale = 1;
-    this.con.imageSmoothingEnabled = false;
-    this.con.webkitImageSmoothingEnabled = false;
-    this.con.mozImageSmoothingEnabled = false;
     this.x = 0;
     this.y = 0;
     return this;
@@ -88,6 +85,9 @@ function Frame(){
   };
 
   this.draw = function(){
+    this.con.imageSmoothingEnabled = false;
+    this.con.webkitImageSmoothingEnabled = false;
+    this.con.mozImageSmoothingEnabled = false;
     this.con.drawImage(this.image, Math.floor(this.index) * this.width, 0, this.width, this.width, this.x+(-this.width*this._scale) / 2, this.y+(-this.width*this._scale) / 2, this.width*this._scale, this.width*this._scale);
     return this;
   };

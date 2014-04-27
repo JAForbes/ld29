@@ -476,7 +476,7 @@ Systems = {
 				position.x + follow.endOffset.x, 
 				position.y + follow.endOffset.y
 			);
-			con.lineWidth = follow.lineWidth || 1;
+			con.lineWidth = follow.lineWidth || 3;
 
 			// line color
 			con.strokeStyle = follow.strokeStyle || 'black';
@@ -497,7 +497,8 @@ Systems = {
 
 
 var boat = E.create({
-	Position : {x: 50, y: -100},
+	Frame: {scale: 4, playspeed: 1/10, frame: new Frame().reset(resource_boat) },
+	Position : {x: 50, y: -120},
 	Bounds: {width: 40, height: 20},
 	BoundsRenderable: {},
 	Movement: {vx: 0, vy: 0},
@@ -509,13 +510,15 @@ var boat = E.create({
 	},
 	MaxSpeed: { vx: 1, vy: 1},
 	WorldBounds: {top: -150, left: -150, right: 150, bottom: 180},
+	AirResistance: {},
+	
 });
 
 
 var player = E.create({
 	Frame: {scale: 2, playspeed: 1/10, frame: new Frame().reset(resource_hook) },
 	Bounds: { width:20, height:30 },
-	Position: { x:0 , y:0 },
+	Position: { x:0 , y:-50 },
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 1, vy: 1},
 	AirResistance: {},
@@ -531,10 +534,10 @@ var player = E.create({
 	BezierFollow: {
 		start: boat,
 		startOffset : {x: 0, y: 0},
-		first: {x: 0, y: -200},
-		second: {x: 0, y: -120},
-		endOffset: {x: 0, y: -(30/2) },
-		strokeStyle: 'white'
+		first: {x: 0, y: -100},
+		second: {x: 0, y: -100},
+		endOffset: {x: 1, y: -(30/2) },
+		strokeStyle: 'rgba(255,255,255,0.8)'
 	},
 	CameraFocused: {},
 	BoundsRenderable: {},
@@ -557,7 +560,7 @@ var jelly = E.create({
 _(9).times(function(i){
 	E.create({
 		Frame: {scale: 3, playspeed: 1/10, frame: new Frame().reset(resource_waves) },
-		Position: {x: ((i-Math.floor(9/2))*16*3),y:E.Position(boat).y}
+		Position: {x: ((i-Math.floor(9/2))*16*3),y:E.Position(boat).y+E.Bounds(boat).height}
 	});
 });
 
