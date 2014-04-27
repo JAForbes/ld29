@@ -522,7 +522,7 @@ var player = E.create({
 	Position: { x:0 , y:-50 },
 	Movement: { vx: 0, vy: 0},
 	MaxSpeed: { vx: 1, vy: 1},
-	AirResistance: {strength: 2},
+	AirResistance: {},
 	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
 	FrictionSensitive: { sensitivity: 1 },
 	CollisionSensitive: {},
@@ -583,6 +583,7 @@ var jelly = E.create({
 	BoundsRenderable: {},
 	Collectable: {},
 	Evade: { these: [player] },
+	WorldBounds: {top: -80, left: -150, right: 150, bottom: 180},
 	Movement: {vx: 0, vy: 0},
 });
 
